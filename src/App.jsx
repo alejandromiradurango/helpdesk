@@ -1,14 +1,14 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
-import { Layout, Navigation, Users, Login } from './components/index';
+import { Layout, Navigation, Users, Login, FormUsers, FormTickets, Tickets } from './components/index';
 
 export const apiUrl = 'http://13.92.232.100:81/HelpDesk/api'
 export const routeServer = "/HelpDeskRG" // Production
+export const config = {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}}
 // export const routeServer = "" // Development
 
 const App = () => {
 
-  console.log(routeServer)
   return (
     <div className="bg-gray-200 h-screen">
       <BrowserRouter>
@@ -16,6 +16,10 @@ const App = () => {
           <Route exact path={routeServer} element={<Layout />}>
             <Route index element={<Navigation />}></Route>
             <Route exact path={routeServer+"/usuarios"} element={<Users/>}></Route>
+            <Route exact path={routeServer+"/usuarios/crear"} element={<FormUsers/>}></Route>
+            <Route exact path={routeServer+"/usuarios/editar/:id"} element={<FormUsers/>}></Route>
+            <Route exact path={routeServer+"/tickets"} element={<Tickets/>}></Route>
+            <Route exact path={routeServer+"/tickets/crear"} element={<FormTickets/>}></Route>
           </Route>
           <Route path={routeServer + "/login"}>
             <Route index element={<Login />}></Route>

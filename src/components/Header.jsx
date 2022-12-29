@@ -10,7 +10,7 @@ const Header = () => {
   const typeUser = localStorage.getItem('typeUser')
 
   return (
-    <header className='bg-blue-900 flex justify-between items-center p-2'>
+    <header className='bg-blue-900 flex justify-between items-center py-4 px-3'>
       <Link to={routeServer} className="text-[1.25em] sm:text-[1.8em] font-bold text-white">HelpDesk</Link>
       <div className='flex items-center gap-4'>
         <p className='text-white hidden sm:flex items-center gap-2 text-lg'>{typeUser === 'TECNICO' ? <FaUserCog /> : <FaUser />}{user}</p>
