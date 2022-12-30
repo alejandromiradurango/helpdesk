@@ -19,8 +19,7 @@ const Users = () => {
       console.log(data)
       setUsers(data.users);
       setTableUsers(data.users);
-      // setLoading(false);
-
+      setLoading(false);
     })
   }
 
@@ -93,9 +92,9 @@ const Users = () => {
           onChange={(e) => searchUsers(e.target.value)}
         />
       </div>
-      {loading && <div className='text-center font-bold text-3xl mt-4 w-full'><FaSpinner /></div>}
+      {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
       <ul>
-        {users.length > 0 && users.map(user => (
+        {users && users.length > 0 && users.map(user => (
           <li key={user.Id} className="bg-white my-2 p-4 rounded-md flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <h2 className="font-bold">{user.Nombre}</h2>
