@@ -16,7 +16,6 @@ const Users = () => {
     setLoading(true)
     axios.get(apiUrl+ '/users', config).then(res => {
       const {data} = res
-      console.log(data)
       setUsers(data.users);
       setTableUsers(data.users);
       setLoading(false);

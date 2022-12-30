@@ -13,16 +13,7 @@ const FormUsers = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const {handleSubmit, watch, formState: {errors}, reset, register} = useForm();
-
-  const userValidation = {
-    required: {
-      value: true,
-      message: 'El usuario es requerido'
-    }
-  }
-  
-console.log(errors);
+  const {handleSubmit, formState: {errors}, reset, register} = useForm();
 
   const createUser = (fields) => {
     axios.post(`${apiUrl}/users`, fields, config)
@@ -50,7 +41,7 @@ console.log(errors);
       getUser();
 
     }
-  }, [])
+  })
 
   const editUser = (fields) => {
     axios.post(`${apiUrl}/edit-user/${id}`, fields, config)

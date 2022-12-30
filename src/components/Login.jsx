@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
@@ -18,7 +18,8 @@ const Login = () => {
         console.log(data)
         if (data.code === 1) {
             localStorage.setItem('token', data.token)
-            localStorage.setItem('user', data.user.Nombre)
+            localStorage.setItem('name', data.user.Nombre)
+            localStorage.setItem('user', data.user.Usuario)
             localStorage.setItem('typeUser', data.user.Tipo)
             navigate(routeServer)
         } else {
@@ -26,6 +27,13 @@ const Login = () => {
         }
       })
   }
+
+  useEffect(() => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('name')
+    localStorage.removeItem('typeUser')
+  }, [])
 
   return (
     <div className='h-full bg-[#0e2a66] flex flex-col items-center justify-center p-2 md:p-0'>
