@@ -44,31 +44,30 @@ const FormUsers = () => {
       getUser();
 
     }
-  }, [])
+  }, [id, reset])
 
   const editUser = (fields) => {
-    // axios.post(`${apiUrl}/edit-user/${id}`, fields, config)
-    //   .then(res => {
-    //     const {data} = res
-    //     Swal.fire(data.message, data.text, data.type)
-    //     navigate(routeServer+"/usuarios")
-    //   }) 
-    console.log(fields)
+    axios.post(`${apiUrl}/edit-user/${id}`, fields, config)
+      .then(res => {
+        const {data} = res
+        Swal.fire(data.message, data.text, data.type)
+        navigate(routeServer+"/usuarios")
+      }) 
   }
 
   return (
     <div className='px-3'>
-      <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 sticky top-0 bg-gray-200">
-        <h1 className="font-bold text-4xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer+"/usuarios"}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> {!id ? 'Crear usuario' : 'Editar usuario'} {!id ? <FaUserPlus /> : <FaUserEdit />}</h1>
+      <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 bg-gray-200">
+        <h1 className="font-bold text-2xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer+"/usuarios"}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> {!id ? 'Crear usuario' : 'Editar usuario'} {!id ? <FaUserPlus /> : <FaUserEdit />}</h1>
       </div>
-      <div className="flex justify-center mt-4">
-        <div className="bg-white rounded-md w-[50em] m-auto p-4">
+      <div className="flex justify-center sm:mt-4 md:h-[80vh]">
+        <div className="bg-white rounded-md w-full md:w-[50em] h-auto mx-auto mt-4 p-4">
           {loading ? (
             <div className='flex items-center justify-center font-bold text-3xl h-[50vh] w-full'><FaSpinner className='animate-spin m-auto block'/></div>
           ) : (
             <>
               <h1 className='text-center font-bold text-[2em]'>Información del usuario</h1>
-              <form onSubmit={handleSubmit(!id ? createUser : editUser)} className="flex flex-col items-center">
+              <form onSubmit={handleSubmit(!id ? createUser : editUser)} className="flex flex-col items-center sm:w-[25em] lg:w-[35em] m-auto">
                 <FormInput 
                   field="Usuario" 
                   register={register}
@@ -118,7 +117,7 @@ const FormUsers = () => {
                           message: 'El tipo es requerido'
                         }
                       }}
-                      options={["USUARIO", "TECNICO"]}
+                      options={["", "USUARIO", "TECNICO"]}
                     />
                     <FormSelect
                       field="Estado"  
@@ -134,7 +133,7 @@ const FormUsers = () => {
                     />
                   </>
                 )}
-                <input className='px-4 py-2 mt-2 text-white font-bold bg-green-500 w-[10em] rounded-md hover:brightness-90 transition-all duration-200 cursor-pointer' type="submit" value={!id ? 'Crear': 'Editar'} />
+                <Button size='lg' variant='gradient' color="green" className='mt-2' type="submit">{!id ? 'Crear': 'Editar'}</Button>
               </form>
             </>
           )}

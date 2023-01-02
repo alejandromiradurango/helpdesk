@@ -73,7 +73,7 @@ const Users = () => {
   return (
     <div className='px-3'>
       <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 bg-gray-200">
-        <h1 className="font-bold text-4xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> Usuarios <FaUsers /></h1>
+        <h1 className="font-bold text-2xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> Usuarios <FaUsers /></h1>
         <div className="flex items-center gap-4">
           {/* <input 
             type="text" 
@@ -81,22 +81,23 @@ const Users = () => {
             placeholder='Buscar usuario...'
             onChange={(e) => searchUsers(e.target.value)}
           /> */}
+          <div className="hidden sm:block w-64">
+            <Input
+              label='Buscar usuario'
+              onChange={(e) => searchUsers(e.target.value)}
+            />
+          </div>
+          <Button variant="gradient" color='green' size='sm' className='p-0'><Link to="crear" className="flex items-center gap-2 font-bold text-xl sm:text-2xl p-2"><FaUserPlus /></Link></Button>
+        </div>
+        <div className='block sm:hidden w-full mb-2'>
           <Input
             label='Buscar usuario'
             onChange={(e) => searchUsers(e.target.value)}
-            className="hidden sm:block w-64"
           />
-          <Button variant="gradient" color='green' size='sm'><Link to="crear" className="flex items-center gap-2 font-bold text-2xl"><FaUserPlus /></Link></Button>
         </div>
-        {/* <input 
-          type="text" 
-          className="sm:hidden p-2 w-full rounded-md border-2 border-gray-500 mb-2"
-          placeholder='Buscar usuario...'
-          onChange={(e) => searchUsers(e.target.value)}
-        /> */}
       </div>
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
-      <ul className='h-[80vh] overflow-auto'>
+      <ul className='h-[72vh] 3xl:h-[82vh] overflow-auto'>
         {users && users.length > 0 && users.map(user => (
           <li key={user.Id} className="bg-white my-2 p-4 rounded-md flex flex-wrap items-center justify-between">
             <div className="flex flex-col gap-1 w-full md:w-auto">
@@ -108,7 +109,7 @@ const Users = () => {
               <Link to={`editar/${user.Id}`}><FaPen className='text-blue-600 cursor-pointer text-2xl'/></Link>
               <FaRegCheckCircle onClick={() => changeStatus(user.Id)} className={`${user.Estado === 'ACTIVO' ? 'text-green-500' : 'text-gray-400'} cursor-pointer text-2xl`}/>
             </div> */}
-            <div className="w-auto ">
+            <div className="w-auto mt-2 sm:mt-0">
               <Menu>
                 <MenuHandler>
                   <Button variant="gradient">Acciones</Button>

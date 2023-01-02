@@ -20,6 +20,7 @@ const App = () => {
             <Route exact path={routeServer+"/usuarios/editar/:id"} element={<FormUsers/>}></Route>
             <Route exact path={routeServer+"/tickets"} element={<Tickets/>}></Route>
             <Route exact path={routeServer+"/tickets/crear"} element={<FormTickets/>}></Route>
+            <Route exact path={routeServer+"/tickets/editar/:id"} element={<FormTickets/>}></Route>
           </Route>
           <Route path={routeServer + "/login"}>
             <Route index element={<Login />}></Route>
