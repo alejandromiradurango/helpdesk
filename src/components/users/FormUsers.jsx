@@ -1,8 +1,9 @@
+import { Button } from '@material-tailwind/react'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaAngleLeft, FaUserPlus, FaUserEdit, FaSpinner } from 'react-icons/fa'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { apiUrl, config, routeServer } from '../../App'
 import {FormInput, FormSelect} from '../index'
@@ -10,6 +11,8 @@ import {FormInput, FormSelect} from '../index'
 const FormUsers = () => {
 
   const {id} = useParams();
+
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
@@ -41,14 +44,16 @@ const FormUsers = () => {
       getUser();
 
     }
-  })
+  }, [])
 
   const editUser = (fields) => {
-    axios.post(`${apiUrl}/edit-user/${id}`, fields, config)
-      .then(res => {
-        const {data} = res
-        Swal.fire(data.message, data.text, data.type)
-      }) 
+    // axios.post(`${apiUrl}/edit-user/${id}`, fields, config)
+    //   .then(res => {
+    //     const {data} = res
+    //     Swal.fire(data.message, data.text, data.type)
+    //     navigate(routeServer+"/usuarios")
+    //   }) 
+    console.log(fields)
   }
 
   return (
@@ -65,10 +70,7 @@ const FormUsers = () => {
               <h1 className='text-center font-bold text-[2em]'>Información del usuario</h1>
               <form onSubmit={handleSubmit(!id ? createUser : editUser)} className="flex flex-col items-center">
                 <FormInput 
-                  type="text" 
                   field="Usuario" 
-                  label="Usuario:" 
-                  placeholder="Ingrese el usuario..."
                   register={register}
                   error={errors.Usuario}
                   validation={{
@@ -79,10 +81,7 @@ const FormUsers = () => {
                   }}
                 />
                 <FormInput 
-                  type="text" 
                   field="Nombre" 
-                  label="Nombre:" 
-                  placeholder="Ingrese el nombre..."
                   register={register}
                   error={errors.Nombre}
                   validation={{
@@ -92,11 +91,8 @@ const FormUsers = () => {
                     }
                   }}
                 />
-                <FormInput 
-                  type="text" 
+                <FormInput  
                   field="Correo" 
-                  label="Correo:" 
-                  placeholder="Ingrese el nombre..."
                   register={register}
                   error={errors.Correo}
                   validation={{
@@ -114,10 +110,8 @@ const FormUsers = () => {
                   <>
                     <FormSelect
                       field="Tipo" 
-                      label="Tipo:" 
                       register={register}
                       error={errors.Tipo}
-                      placeholder="Seleccione un tipo"
                       validation={{
                         required: {
                           value: true,
@@ -127,11 +121,9 @@ const FormUsers = () => {
                       options={["USUARIO", "TECNICO"]}
                     />
                     <FormSelect
-                      field="Estado" 
-                      label="Estado:" 
+                      field="Estado"  
                       register={register}
                       error={errors.Estado}
-                      placeholder="Seleccione un estado"
                       validation={{
                         required: {
                           value: true,

@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { apiUrl, routeServer } from '../App'
+import { Input } from "@material-tailwind/react";
 
 const Login = () => {
   const { register, handleSubmit, formState: {errors} } = useForm()
@@ -41,7 +42,7 @@ const Login = () => {
             <h1 className="text-2xl text-center font-bold uppercase">Iniciar sesión</h1>
             <form className='flex flex-col gap-4 w-full' onSubmit={handleSubmit(doLogin)}>
                 <div className='flex flex-col items-start w-[90%] m-auto sm:w-[23em] relative'>
-                    <input 
+                    {/* <input 
                     className={`rounded-md shadow-md py-2 px-4 w-full border-2 outline-none ${errors.email && 'border-red-500 pt-5'} transition-all `}
                     placeholder="Ingresa tu correo..."
                     {...register('email', {
@@ -55,9 +56,23 @@ const Login = () => {
                         }
                     })}
                     />
-                    {errors.email && <small className='text-red-500 font-bold absolute top-1 left-2'>* {errors.email.message}</small>}
+                    {errors.email && <small className='text-red-500 font-bold absolute top-1 left-2'>* {errors.email.message}</small>} */}
+                    <Input 
+                        label={errors.email ? errors.email.message : "Correo"} 
+                        error={errors.email} 
+                        {...register('email', {
+                            required: {
+                                value: true,
+                                message: 'Correo requerido',
+                            },
+                            pattern: {
+                                value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                                message: 'Correo no válido'
+                            }
+                        })}
+                    />
                 </div>
-                <input className="w-36 m-auto block font-bold bg-sky-600 text-white py-2 cursor-pointer uppercase rounded-md hover:brightness-75 transition-all duration-300" type="submit" value="Ingresar" />
+                <input className="w-36 m-auto block font-bold bg-blue-600 text-white py-2 cursor-pointer uppercase rounded-md hover:brightness-75 transition-all duration-300" type="submit" value="Ingresar" />
             </form>
         </div>
     </div>
