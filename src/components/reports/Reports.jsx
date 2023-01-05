@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { FaAngleLeft, FaRegCheckCircle, FaRegClock, FaSpinner, FaTicketAlt, FaUser } from 'react-icons/fa'
 import { TbReportAnalytics } from 'react-icons/tb'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { apiUrl, config, routeServer } from '../../App';
 import FormSelect from '../form/FormSelect';
 import * as XLSX from 'xlsx';
@@ -58,7 +58,7 @@ const Ticket =({ticket}) => (
           </div>
           <div className="flex flex-col items-start justify-start gap-2 lg:flex-row lg:items-center lg:gap-8 px-4">
             <div className="flex flex-col">
-                <span>Ticket <b>{ticket.Estado}</b></span>
+                <span>Estado: <b>{ticket.Estado}</b></span>
                 <span>Tecnico: <b>{ticket.Tecnico}</b></span>
                 <span>Categoria: <b>{ticket.Categoria}</b></span>
                 <span>Subcategoria: <b>{ticket.Subcategoria}</b></span>
@@ -75,9 +75,16 @@ const Reports = () => {
   const [subcategories, setSubcategories] = useState([])
   const [tableSub, setTableSub] = useState([])
   const [loading, setLoading] = useState(false)
+  const [downloaded, setDownloaded] = useState(false)
   const [tickets, setTickets] = useState(undefined)
 
+  const navigate = useNavigate()
+
   useEffect(() => {
+    if (localStorage.getItem('typeUser') !== 'TECNICO'){
+        navigate(routeServer)
+    }
+
     setLoading(true)
     axios.get(`${apiUrl}/helpers`, config)
      .then(res => {
@@ -87,6 +94,7 @@ const Reports = () => {
         setTableSub(data.subcategories)
       })
     setLoading(false)
+    // eslint-disable-next-line
   }, [])
 
   const selectInput = [
@@ -136,6 +144,7 @@ const Reports = () => {
                     const {data} = res;
                     setTickets(data.tickets)
                     setLoading(false)
+                    setDownloaded(false)
                     setTimeout(() => {
                         window.scrollBy({
                             top: 1000,
@@ -153,6 +162,7 @@ const Reports = () => {
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
     XLSX.writeFile(wb, `reporte-${uniqid()}.xlsx`);
+    setDownloaded(true);
   }
   
 
@@ -204,11 +214,11 @@ const Reports = () => {
             <div className='rounded-md bg-white shadow-md p-4 my-2'>
                 <div className='flex justify-between items-center mb-3'>
                     <h1 className='font-bold text-2xl uppercase'>Tickets <small className='opacity-50 text-sm'>({tickets.length} tickets)</small></h1>
-                    <Button color='gray' onClick={() => downloadReport(tickets)} disabled={tickets.length === 0}>
-                        Exportar
+                    <Button color='gray' onClick={() => downloadReport(tickets)} disabled={tickets.length === 0 || downloaded}>
+                        {!downloaded ? 'Exportar' : 'Descargado'}
                     </Button>
                 </div>
-                <ul className='h-[80vh] overflow-auto'>
+                <ul className={`${tickets.length > 0 && 'h-[80vh] overflow-auto'}`}>
                     {tickets.map(ticket => (
                         <Ticket key={ticket.Id} ticket={ticket}/>
                     ))}

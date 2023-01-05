@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { FaUsers, FaUserPlus, FaUser, FaPen, FaCog, FaRegCheckCircle, FaAngleLeft, FaSpinner } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
 import {
@@ -31,8 +31,14 @@ const Users = () => {
     })
   }
 
+  const navigate = useNavigate();
+
   useEffect(() => {
+    if (localStorage.getItem('typeUser') !== 'TECNICO'){
+      navigate(routeServer)
+    }
     getUsers();
+    // eslint-disable-next-line
   }, [])
 
   const searchUsers = (term) => {

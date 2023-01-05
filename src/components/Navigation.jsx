@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import {routeServer} from '../App'
 
 const Module = ({icon, title, link}) => (
-    <Link className="bg-gray-100 shadow-md hover:shadow-2xl text-3xl font-bold p-12 w-[90%] sm:w-[10em] sm:p-24 rounded-md flex flex-col gap-2 items-center hover:scale-105 transition-all duration-200" to={routeServer+link}>
+    <Link className="bg-gray-100 shadow-md hover:shadow-2xl text-3xl font-bold py-12 w-[90%] sm:w-[10em] sm:py-24 text-center rounded-md flex flex-col gap-2 items-center hover:scale-105 transition-all duration-200" to={routeServer+link}>
         {icon}
         <span>{title}</span>
     </Link>
