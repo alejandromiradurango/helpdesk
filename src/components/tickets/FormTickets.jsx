@@ -78,13 +78,10 @@ const FormTickets = () => {
   const {Categoria, Estado} = watch()
 
   useEffect(() => {
-    const results = tableSub.filter((sub) => {
-        if ( sub.Categoria.includes(Categoria) ) return sub;
-      });
-    
+    const results = tableSub.filter(sub => sub.Categoria.includes(Categoria));
       setSubcategories(results);
       setShowSub(true)
-  }, [Categoria]);
+  }, [Categoria, tableSub]);
 
   return (
     <div className='px-3'>

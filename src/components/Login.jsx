@@ -12,11 +12,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   const doLogin = (fields) => {
-    console.log(fields)
     axios.post(`${apiUrl}/token`, fields)
      .then((res) => {
         const {data} = res;
-        console.log(data)
         if (data.code === 1) {
             localStorage.setItem('token', data.token)
             localStorage.setItem('name', data.user.Nombre)

@@ -134,12 +134,10 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
             if (result.isConfirmed) {
                 axios.post(`${apiUrl}/add-observation/${id}`, {Observacion: result.value}, config)
                     .then(res => {
-                        console.log(res)
                         const {data} = res;
                         Swal.fire(data.message, data.text, data.type)
                         getTickets();
                     })
-                // Swal.fire('', result.value, 'success')
             }
         });
     }

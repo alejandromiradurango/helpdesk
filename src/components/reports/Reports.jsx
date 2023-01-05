@@ -3,10 +3,9 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { FaAngleLeft } from 'react-icons/fa'
+import { FaAngleLeft, FaRegCheckCircle, FaRegClock, FaSpinner, FaTicketAlt, FaUser } from 'react-icons/fa'
 import { TbReportAnalytics } from 'react-icons/tb'
 import { Link } from 'react-router-dom'
-import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
 import FormSelect from '../form/FormSelect';
 import * as XLSX from 'xlsx';
@@ -25,14 +24,57 @@ const InputDate = ({register, field, styles}) => (
     </div>
 )
 
+const Ticket =({ticket}) => (
+    <li className="relative bg-gray-100 my-2 pr-4 rounded-md flex flex-col md:flex-row md:items-center justify-between hover:shadow-md transition-all duration-150 py-2 border-2 border-[#999999]">
+          <div className="px-4 py-2 flex flex-col items-start">
+              <div className="flex flex-col px-1 lg:flex-row lg:items-center lg:gap-2 text-gray-600">
+                  <div className='flex items-center gap-2'>
+                    <FaTicketAlt />
+                    <b>#{ticket.Id} | {ticket.Tipo}</b>
+                  </div>
+                  <div className="font-bold flex flex-col sm:flex-row items-center gap-1 sm:gap-2">
+                      <div className="flex items-center gap-2">
+                        <FaRegClock title="Fecha de creación"/>
+                        <span title="Fecha de creación"><span className='block md:hidden'>Creación: </span>{dayjs(ticket.FechaC).utc().format('DD/MM/YYYY h:mm A')}</span>
+                      </div>
+                      {ticket.FechaF && (
+                      <>
+                          <span className='hidden md:block'> - </span>
+                          <div className='flex items-center gap-2'>
+                            <FaRegCheckCircle title="Fecha de cierre"/>
+                            <span title="Fecha de cierre"><span className='block md:hidden'>Cierre: </span>{dayjs(ticket.FechaF).utc().format('DD/MM/YYYY h:mm A')}</span> 
+                          </div>     
+                      </>
+                      )}            
+                  </div>
+              </div>
+              <h2 className="font-bold text-xl border-t-2 border-[#e2e2e2] md:border-t-0 w-full mt-2 pt-2 md:mt-0 md:pt-2 flex items-center gap-2">
+                {ticket.Titulo}
+              </h2>
+              <div className="flex items-center gap-2 opacity-50 font-bold">
+                  <FaUser />
+                  <span>{ticket.Usuario}</span>
+              </div>
+          </div>
+          <div className="flex flex-col items-start justify-start gap-2 lg:flex-row lg:items-center lg:gap-8 px-4">
+            <div className="flex flex-col">
+                <span>Ticket <b>{ticket.Estado}</b></span>
+                <span>Tecnico: <b>{ticket.Tecnico}</b></span>
+                <span>Categoria: <b>{ticket.Categoria}</b></span>
+                <span>Subcategoria: <b>{ticket.Subcategoria}</b></span>
+            </div>
+          </div>
+        </li>
+) 
+
 const Reports = () => {
 
-  const { register, handleSubmit, watch } = useForm();
+  const { register, handleSubmit, watch, reset, formState: {isDirty} } = useForm();
 
   const [categories, setCategories] = useState([])
   const [subcategories, setSubcategories] = useState([])
   const [tableSub, setTableSub] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [tickets, setTickets] = useState(undefined)
 
   useEffect(() => {
@@ -82,15 +124,26 @@ const Reports = () => {
   }, [Categoria, tableSub]);
 
   const generateReport = (data) => {
+    setLoading(true)
+    setTickets(undefined)
     data.FechaC = [];
     if (data.Desde !== '') data.FechaC.push(dayjs(data.Desde).format("YYYYMMDD")); 
     if (data.Hasta !== '') data.FechaC.push(dayjs(data.Hasta).format("YYYYMMDD")) ;
-    axios.post(`${apiUrl}/generate-report`, data, config)
-     .then(res => {
-            const {data} = res;
-            Swal.fire(data.message, '', data.type)
-            setTickets(data.tickets)
-        })
+    
+    setTimeout(() => {
+        axios.post(`${apiUrl}/generate-report`, data, config)
+            .then(res => {
+                    const {data} = res;
+                    setTickets(data.tickets)
+                    setLoading(false)
+                    setTimeout(() => {
+                        window.scrollBy({
+                            top: 1000,
+                            behavior: "smooth"
+                        })
+                    }, 250)
+                })
+    }, 500);
   }
 
   const inputStyle = 'transition-all duration-200 rounded-md border p-2 m-auto w-full md:w-[10em] focus:outline-2 text-sm bg-white border-blue-gray-200 focus:border-blue-500 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:appearance-none'
@@ -112,6 +165,11 @@ const Reports = () => {
         <form onSubmit={handleSubmit(generateReport)} className='rounded-md bg-white shadow-md p-4 my-2'>
             <div className='flex justify-between items-center'>
                 <h1 className='font-bold text-2xl uppercase'>Filtros</h1>
+                {isDirty && (
+                    <Button color='red' onClick={() => reset()} className="animate-fade-in">
+                        Limpiar
+                    </Button>
+                )}
                 <Button type='submit' color='green'>
                     Generar
                 </Button>
@@ -141,19 +199,21 @@ const Reports = () => {
                 </div>
             )}
         </form>
+        {loading && <div className='text-center font-bold mt-40 text-[3em] grid'><FaSpinner className='animate-spin m-auto block'/></div>}
         {tickets && (
             <div className='rounded-md bg-white shadow-md p-4 my-2'>
-                <div className='flex justify-between items-center'>
+                <div className='flex justify-between items-center mb-3'>
                     <h1 className='font-bold text-2xl uppercase'>Tickets <small className='opacity-50 text-sm'>({tickets.length} tickets)</small></h1>
-                    <Button color='gray' onClick={() => downloadReport(tickets)}>
+                    <Button color='gray' onClick={() => downloadReport(tickets)} disabled={tickets.length === 0}>
                         Exportar
                     </Button>
                 </div>
-                <ul className=''>
+                <ul className='h-[80vh] overflow-auto'>
                     {tickets.map(ticket => (
-                        <li>{ticket.Titulo}</li>
+                        <Ticket key={ticket.Id} ticket={ticket}/>
                     ))}
-                </ul>           
+                </ul>  
+                {tickets.length === 0 && <div className="font-bold text-center text-2xl uppercase">Sin resultados</div>}     
             </div>
         )}
       </div>
