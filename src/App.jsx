@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
-import { Layout, Navigation, Users, Login, FormUsers, FormTickets, Tickets } from './components/index';
+import { Layout, Navigation, Users, Login, FormUsers, FormTickets, Tickets, Reports } from './components/index';
 
 export const apiUrl = 'http://13.92.232.100:81/HelpDesk/api'
 export const routeServer = "/HelpDeskRG" // Production
@@ -21,6 +21,7 @@ const App = () => {
             <Route exact path={routeServer+"/tickets"} element={<Tickets/>}></Route>
             <Route exact path={routeServer+"/tickets/crear"} element={<FormTickets/>}></Route>
             <Route exact path={routeServer+"/tickets/editar/:id"} element={<FormTickets/>}></Route>
+            <Route exact path={routeServer+"/reportes"} element={<Reports/>}></Route>
           </Route>
           <Route path={routeServer + "/login"}>
             <Route index element={<Login />}></Route>

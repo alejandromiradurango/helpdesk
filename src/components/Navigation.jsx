@@ -20,7 +20,7 @@ const Navigation = () => {
         {typeUser === 'TECNICO' && (
           <>
             <Module icon={<FaUsers />} title="Usuarios" link="/usuarios"/>
-            <Module icon={<FaCog />} title="Reportes" link="#"/>
+            <Module icon={<FaCog />} title="Reportes" link="/reportes"/>
           </>
         )}
     </div>

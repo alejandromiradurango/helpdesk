@@ -3,9 +3,9 @@ import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 import { FaUserPlus, FaUser, FaRegCheckCircle, FaAngleLeft, FaSpinner, FaTicketAlt, FaRegClock, FaAngleDown, FaBan, FaPen, FaEye } from 'react-icons/fa'
-import {BsFileEarmarkCheckFill} from 'react-icons/bs'
+import {BsFileEarmarkCheckFill, BsQuestionCircleFill} from 'react-icons/bs'
 import { Link } from 'react-router-dom'
-import { Menu, MenuHandler, MenuList, MenuItem, Button, Input } from "@material-tailwind/react";
+import { Menu, MenuHandler, MenuList, MenuItem, Button, Input, Popover, PopoverHandler, PopoverContent } from "@material-tailwind/react";
 import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
 dayjs.extend(utc)
@@ -132,13 +132,14 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
         })
         .then(result => {
             if (result.isConfirmed) {
-                // axios.post(`${apiUrl}/end-ticket/${id}`, {Solucion: result.value}, config)
-                //     .then(res => {
-                //         const {data} = res;
-                //         Swal.fire(data.message, data.text, data.type)
-                //         getTickets();
-                //     })
-                Swal.fire('', result.value, 'success')
+                axios.post(`${apiUrl}/add-observation/${id}`, {Observacion: result.value}, config)
+                    .then(res => {
+                        console.log(res)
+                        const {data} = res;
+                        Swal.fire(data.message, data.text, data.type)
+                        getTickets();
+                    })
+                // Swal.fire('', result.value, 'success')
             }
         });
     }
@@ -167,7 +168,22 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
                       )}            
                   </div>
               </div>
-              <h2 className="font-bold text-xl border-t-2 border-[#e2e2e2] md:border-t-0 w-full mt-2 pt-2 md:mt-0 md:pt-2">{ticket.Titulo}</h2>
+              <h2 className="font-bold text-xl border-t-2 border-[#e2e2e2] md:border-t-0 w-full mt-2 pt-2 md:mt-0 md:pt-2 flex items-center gap-2">
+                {ticket.Titulo}
+                {ticket.Observacion && ticket.Estado !== 'CERRADO' && (
+                  <Popover placement='right'>
+                    <PopoverHandler>
+                      <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500'>
+                        <BsQuestionCircleFill />
+                      </Button>
+                    </PopoverHandler>
+                    <PopoverContent>
+                      <h1 className='py-2 border-b font-bold text-xl uppercase'>Observacion</h1>
+                      <p className='p-2 text-md'>{ticket.Observacion}</p>
+                    </PopoverContent>
+                  </Popover> 
+                )}      
+              </h2>
               {typeUser === 'TECNICO' && (
                   <div className="flex items-center gap-2 opacity-50 font-bold">
                       <FaUser />
@@ -212,7 +228,7 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
                       Editar
                     </Link>
                   </MenuItem>
-                  {!ticket.Observacion && <MenuItem className='flex items-center gap-2' onClick={() => addObservation(ticket.Id)}><FaEye className='text-blue-gray-700'/> Observación</MenuItem>}
+                  {!ticket.Observacion && ticket.Estado !== 'CERRADO' && <MenuItem className='flex items-center gap-2' onClick={() => addObservation(ticket.Id)}><FaEye className='text-blue-gray-700'/> Observación</MenuItem>}
                 </>
                 )}
                 {ticket.Estado !== 'CERRADO' && <MenuItem className='flex items-center gap-2' onClick={() => cancelTicket(ticket.Id)}><FaBan className='text-red-600 text-xl'/> Cancelar</MenuItem>}

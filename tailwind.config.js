@@ -10,7 +10,9 @@ module.exports = withMT({
         },
     },
     screens: {
-      '3xl': "1700px"
+      'md':'640px',
+      '3xl': "1700px",
+      'xxs': '200px'
     },
   },
   plugins: [],

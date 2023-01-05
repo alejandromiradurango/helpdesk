@@ -1,10 +1,10 @@
 import React from 'react'
 
-const FormSelect = ({register, error, label, field, validation, options, ...inputProps}) => {
+const FormSelect = ({register, error, label = true, field, validation, options =[], ...inputProps}) => {
     
     return (
-        <div className='flex justify-between items-center gap-[3em] my-[1em] mx-auto w-full'>
-          <label className='font-bold uppercase hidden sm:block' htmlFor={field}>{field}:</label>
+        <div className={`flex justify-between items-center gap-[3em] my-[1em] mx-auto ${label ? 'w-full' : 'w-auto'}`}>
+          {label && <label className='font-bold uppercase hidden sm:block' htmlFor={field}>{field}:</label>}
           <div className='relative w-full md:w-auto'>
             <span className={`absolute -top-2 bg-white px-1 text-xs left-[.7rem] pointer-events-none ${error ? 'text-red-500 z-2' : 'text-[#757e83]'} ${inputProps.disabled && 'hidden'}`}>{error ? error.message : field}</span>
             <select 
@@ -12,7 +12,7 @@ const FormSelect = ({register, error, label, field, validation, options, ...inpu
                 {...register(field, validation)}
                 {...inputProps}
             >
-                <option value="" hidden >Seleccione...</option>
+                <option value="" hidden={label} >Seleccione...</option>
                 {options.map(value => (
                     <option key={value} value={value} className='text-blue-gray-700'>
                     {value}

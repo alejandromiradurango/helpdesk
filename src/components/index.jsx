@@ -11,6 +11,8 @@ export {default as FormTickets} from './tickets/FormTickets'
 export {default as Navigation} from './Navigation'
 export {default as Login} from './Login'
 
+export {default as Reports} from './reports/Reports'
+
 // Form components
 export {default as FormInput} from './form/FormInput'
 export {default as FormSelect} from './form/FormSelect'

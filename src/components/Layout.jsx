@@ -1,7 +1,6 @@
-import axios from 'axios';
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { apiUrl, routeServer } from '../App';
+import { routeServer } from '../App';
 import {Header} from './index'
 
 const Layout = () => {
