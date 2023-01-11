@@ -10,7 +10,9 @@ import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
 dayjs.extend(utc)
 
-const Ticket = ({ticket, typeUser, getTickets}) => {
+const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
+
+    console.log(technicians);
 
     const [seeMore, setSeeMore] = useState(false)
 
@@ -36,8 +38,8 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
             axios.post(`${apiUrl}/cancel-ticket/${id}`, {}, config)
                 .then(res => {
                     const {data} = res;
-                    Swal.fire(data.message, data.text, data.type);
                     getTickets();
+                    Swal.fire(data.message, data.text, data.type);
                 })
             
           }
@@ -48,13 +50,8 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
         Swal.fire({
           title: `Agendar tecnico al ticket #${id}`,
           input: 'select',
-          inputOptions: {
-            'DanielZora': 'Daniel Zora',
-            'HernanRendon': 'Hernan Rendón',
-            'AlexanderAlvarez': 'Alexander Alvarez',
-            'AlejandroMira': 'Alejandro Mira'
-          },
-          inputPlaceholder: 'Seleccion un tecnico',
+          inputOptions: technicians.filter(tech => tech.Usuario !== 'SoporteGeneral').map(tech => tech.Usuario),
+          inputPlaceholder: 'Seleccione un tecnico',
           showCancelButton: true,
           confirmButtonColor: '#29c53e',
           cancelButtonColor: '#666666',
@@ -75,8 +72,8 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
             axios.post(`${apiUrl}/tickets/${id}/${result.value}`, {}, config)
                 .then(res => {
                     const {data} = res;
-                    Swal.fire(data.message, data.text, data.type)
                     getTickets();
+                    Swal.fire(data.message, data.text, data.type)
                 })
           }
         });
@@ -105,8 +102,8 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
                 axios.post(`${apiUrl}/end-ticket/${id}`, {Solucion: result.value}, config)
                     .then(res => {
                         const {data} = res;
-                        Swal.fire(data.message, data.text, data.type)
                         getTickets();
+                        Swal.fire(data.message, data.text, data.type)
                     })
             }
         });
@@ -135,8 +132,8 @@ const Ticket = ({ticket, typeUser, getTickets}) => {
                 axios.post(`${apiUrl}/add-observation/${id}`, {Observacion: result.value}, config)
                     .then(res => {
                         const {data} = res;
-                        Swal.fire(data.message, data.text, data.type)
                         getTickets();
+                        Swal.fire(data.message, data.text, data.type)
                     })
             }
         });
@@ -241,6 +238,7 @@ const Tickets = () => {
 
   const [tickets, setTickets] = useState([]);
   const [tableTickets, setTableTickets] = useState([]);
+  const [technicians, setTechnicians] = useState([])
   const [validation, setValidation] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -265,6 +263,12 @@ const Tickets = () => {
 
   useEffect(() => {
     getTickets();
+
+    axios.get(`${apiUrl}/users`, config)
+       .then(res => {
+            const {data} = res;
+            setTechnicians(data.users.filter(user => user.Tipo === 'TECNICO'));
+       })
     // eslint-disable-next-line
   }, [])
 
@@ -315,9 +319,9 @@ const Tickets = () => {
         </div>
       </div>
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
-      <ul className='overflow-auto h-[73vh]'>
+      <ul className='overflow-auto h-[73vh] 3xl:h-[82vh]'>
         {tickets && tickets.length > 0 && tickets.map(ticket => (
-          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets}/>
+          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={technicians}/>
         )).reverse()}
       </ul>
       {validation && <div className='text-center font-bold text-3xl mt-4'>Sin resultados</div>}

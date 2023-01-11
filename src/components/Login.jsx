@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2'
@@ -9,22 +9,28 @@ import { Input } from "@material-tailwind/react";
 const Login = () => {
   const { register, handleSubmit, formState: {errors} } = useForm()
 
+  const [loading, setLoading] = useState(false)
+
   const navigate = useNavigate();
 
   const doLogin = (fields) => {
-    axios.post(`${apiUrl}/token`, fields)
-     .then((res) => {
-        const {data} = res;
-        if (data.code === 1) {
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('name', data.user.Nombre)
-            localStorage.setItem('user', data.user.Usuario)
-            localStorage.setItem('typeUser', data.user.Tipo)
-            navigate(routeServer)
-        } else {
-            Swal.fire(data.message, '', data.type)
-        }
-      })
+    setLoading(true)
+    setTimeout(() => {
+        axios.post(`${apiUrl}/token`, fields)
+            .then((res) => {
+                const {data} = res;
+                if (data.code === 1) {
+                    localStorage.setItem('token', data.token)
+                    localStorage.setItem('name', data.user.Nombre)
+                    localStorage.setItem('user', data.user.Usuario)
+                    localStorage.setItem('typeUser', data.user.Tipo)
+                    navigate(routeServer)
+                } else {
+                    Swal.fire(data.message, '', data.type)
+                }
+                setLoading(false)
+            })
+    }, 1500);
   }
 
   useEffect(() => {
@@ -68,9 +74,10 @@ const Login = () => {
                                 message: 'Correo no válido'
                             }
                         })}
+                        disabled={loading}
                     />
                 </div>
-                <input className="w-36 m-auto block font-bold bg-blue-600 text-white py-2 cursor-pointer uppercase rounded-md hover:brightness-75 transition-all duration-300" type="submit" value="Ingresar" />
+                <input className="w-36 m-auto block font-bold bg-blue-600 text-white py-2 cursor-pointer uppercase rounded-md hover:brightness-75 transition-all duration-300 disabled:brightness-75 disabled:cursor-wait" type="submit" value="Ingresar" disabled={loading}/>
             </form>
         </div>
     </div>

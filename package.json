@@ -1,6 +1,6 @@
 {
   "name": "helpdesk-create",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "homepage": "http://13.92.232.100:81/HelpDeskRG/",
   "dependencies": {
     "@material-tailwind/react": "^1.2.4",

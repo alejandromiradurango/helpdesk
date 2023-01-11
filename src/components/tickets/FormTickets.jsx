@@ -21,17 +21,19 @@ const FormTickets = () => {
   const [tableSub, setTableSub] = useState([]);
   const [technicians, setTechnicians] = useState([]);
 
-  const {handleSubmit, formState: {errors}, reset, register, watch} = useForm();
+  const {handleSubmit, formState: {errors}, reset, register, watch} = useForm({defaultValues: {Solucion: "", Observacion: "", Tecnico:""}});
 
   const createTicket = (fields) => {
+    setLoading(true)
     fields.Usuario = localStorage.getItem('user') 
     axios.post(`${apiUrl}/tickets`, fields, config)
       .then(res => {
         const {data} = res
         Swal.fire(data.message, data.text, data.type)
         if (data.code === 1){
-          reset();
+          navigate(routeServer+"/tickets")
         }
+        setLoading(false)
       }) 
   }
 
@@ -40,8 +42,8 @@ const FormTickets = () => {
         setLoading(true)
         axios.get(`${apiUrl}/tickets/${id}`, config)
           .then(res => {
-            const {Tipo, Titulo, Descripcion, Solucion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario} = res.data.ticket;
-            reset({Tipo, Titulo, Descripcion, Solucion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario})
+            const {Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario} = res.data.ticket;
+            reset({Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario})
             setTimeout(() => setLoading(false), 1000)
           })
       }
@@ -67,11 +69,16 @@ const FormTickets = () => {
   
 
   const editTicket = (fields) => {
+    const keys = Object.keys(fields)
+    for(let i=0; i< keys.length; i++){
+      if (fields[keys[i]] === null) fields[keys[i]] = '';
+    }
+    setLoading(true)
     axios.post(`${apiUrl}/edit-ticket/${id}`, fields, config)
       .then(res => {
         const {data} = res
-        Swal.fire(data.message, data.text, data.type)
         navigate(routeServer+"/tickets")
+        Swal.fire(data.message, data.text, data.type)
       }) 
   }
 
@@ -134,19 +141,22 @@ const FormTickets = () => {
                   }}
                   disabled={Estado === 'CERRADO' && true}
                 />
-                {id && <FormInput 
+                {id && <>
+                  <FormInput 
+                    type='textarea'
+                    field="Solucion" 
+                    register={register}
+                    error={errors.Solucion}
+                    disabled={Estado === 'CERRADO' && true}
+                  />
+                  <FormInput 
                   type='textarea'
-                  field="Solucion" 
+                  field="Observacion" 
                   register={register}
-                  error={errors.Solucion}
-                  validation={{
-                    required: {
-                      value: true,
-                      message: 'La solucionTecnico es requerida'
-                    }
-                  }}
+                  error={errors.Observacion}
                   disabled={Estado === 'CERRADO' && true}
-                />}
+                />
+                </>}
                 <FormSelect
                   field="Categoria" 
                   register={register}
@@ -194,12 +204,6 @@ const FormTickets = () => {
                       field="Tecnico" 
                       register={register}
                       error={errors.Tecnico}
-                      validation={{
-                          required: {
-                          value: true,
-                          message: 'El tecnico es requerido'
-                          }
-                      }}
                       options={technicians.map(tech => tech.Usuario)}
                       disabled={Estado === 'CERRADO' && true}
                     />

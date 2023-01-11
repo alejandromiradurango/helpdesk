@@ -103,7 +103,7 @@ const Users = () => {
         </div>
       </div>
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
-      <ul className='h-[72vh] 3xl:h-[82vh] overflow-auto'>
+      <ul className='h-[73vh] 3xl:h-[82vh] overflow-auto'>
         {users && users.length > 0 && users.map(user => (
           <li key={user.Id} className="bg-white my-2 p-4 rounded-md flex flex-wrap items-center justify-between">
             <div className="flex flex-col gap-1 w-full md:w-auto">

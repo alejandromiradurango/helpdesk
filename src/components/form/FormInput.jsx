@@ -1,7 +1,7 @@
 import { Input, Textarea } from '@material-tailwind/react'
 import React from 'react'
 
-const FormInput = ({register, error, field, validation, type = 'input', ...inputProps}) => {
+const FormInput = ({register, error, field, validation = {}, type = 'input', ...inputProps}) => {
 
     return (
         <div className='flex justify-between items-center gap-[3em] my-[1em] mx-auto w-full'>

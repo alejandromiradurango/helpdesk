@@ -19,6 +19,7 @@ const FormUsers = () => {
   const {handleSubmit, formState: {errors}, reset, register} = useForm();
 
   const createUser = (fields) => {
+    setLoading(true)
     axios.post(`${apiUrl}/users`, fields, config)
       .then(res => {
         const {data} = res
@@ -26,23 +27,19 @@ const FormUsers = () => {
         if (data.code === 1){
           reset();
         }
+        setLoading(false)
       }) 
   }
 
   useEffect(() => {
     if (id) {
-      const getUser = () => {
-        setLoading(true)
-        axios.get(`${apiUrl}/users/${id}`, config)
-          .then(res => {
-            const {Usuario, Nombre, Correo, Tipo, Estado} = res.data.user;
-            reset({Usuario, Nombre, Correo, Tipo, Estado})
-            setLoading(false)
-          })
-      }
-
-      getUser();
-
+      setLoading(true)
+      axios.get(`${apiUrl}/users/${id}`, config)
+        .then(res => {
+          const {Usuario, Nombre, Correo, Tipo, Estado} = res.data.user;
+          reset({Usuario, Nombre, Correo, Tipo, Estado})
+          setLoading(false)
+        })
     }
   }, [id, reset])
 
@@ -50,8 +47,8 @@ const FormUsers = () => {
     axios.post(`${apiUrl}/edit-user/${id}`, fields, config)
       .then(res => {
         const {data} = res
-        Swal.fire(data.message, data.text, data.type)
         navigate(routeServer+"/usuarios")
+        Swal.fire(data.message, data.text, data.type)
       }) 
   }
 
@@ -61,7 +58,7 @@ const FormUsers = () => {
         <h1 className="font-bold text-2xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer+"/usuarios"}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> {!id ? 'Crear usuario' : 'Editar usuario'} {!id ? <FaUserPlus /> : <FaUserEdit />}</h1>
       </div>
       <div className="flex justify-center sm:mt-4 md:h-[80vh]">
-        <div className="bg-white rounded-md w-full md:w-[50em] h-auto mx-auto mt-4 p-4">
+        <div className="bg-white rounded-md w-full md:w-[50em] h-auto 3xl:h-fit mx-auto mt-4 p-4">
           {loading ? (
             <div className='flex items-center justify-center font-bold text-3xl h-[50vh] w-full'><FaSpinner className='animate-spin m-auto block'/></div>
           ) : (
