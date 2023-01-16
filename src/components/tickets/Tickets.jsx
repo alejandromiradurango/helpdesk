@@ -5,14 +5,12 @@ import React, { useEffect, useState } from 'react'
 import { FaUserPlus, FaUser, FaRegCheckCircle, FaAngleLeft, FaSpinner, FaTicketAlt, FaRegClock, FaAngleDown, FaBan, FaPen, FaEye } from 'react-icons/fa'
 import {BsFileEarmarkCheckFill, BsQuestionCircleFill} from 'react-icons/bs'
 import { Link } from 'react-router-dom'
-import { Menu, MenuHandler, MenuList, MenuItem, Button, Input, Popover, PopoverHandler, PopoverContent } from "@material-tailwind/react";
+import { Menu, MenuHandler, MenuList, MenuItem, Button, Input } from "@material-tailwind/react";
 import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
 dayjs.extend(utc)
 
 const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
-
-    console.log(technicians);
 
     const [seeMore, setSeeMore] = useState(false)
 
@@ -50,7 +48,7 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
         Swal.fire({
           title: `Agendar tecnico al ticket #${id}`,
           input: 'select',
-          inputOptions: technicians.filter(tech => tech.Usuario !== 'SoporteGeneral').map(tech => tech.Usuario),
+          inputOptions: technicians,
           inputPlaceholder: 'Seleccione un tecnico',
           showCancelButton: true,
           confirmButtonColor: '#29c53e',
@@ -166,17 +164,9 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
               <h2 className="font-bold text-xl border-t-2 border-[#e2e2e2] md:border-t-0 w-full mt-2 pt-2 md:mt-0 md:pt-2 flex items-center gap-2">
                 {ticket.Titulo}
                 {ticket.Observacion && ticket.Estado !== 'CERRADO' && (
-                  <Popover placement='right'>
-                    <PopoverHandler>
-                      <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500'>
-                        <BsQuestionCircleFill />
-                      </Button>
-                    </PopoverHandler>
-                    <PopoverContent>
-                      <h1 className='py-2 border-b font-bold text-xl uppercase'>Observacion</h1>
-                      <p className='p-2 text-md'>{ticket.Observacion}</p>
-                    </PopoverContent>
-                  </Popover> 
+                    <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500' onClick={() => Swal.fire(`Observación - Ticket #${ticket.Id}`, ticket.Observacion, 'info')}>
+                      <BsQuestionCircleFill />
+                    </Button>
                 )}      
               </h2>
               {typeUser === 'TECNICO' && (
@@ -216,7 +206,7 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
                 {typeUser === 'TECNICO' && (
                 <>
                   {ticket.Tecnico === 'SoporteGeneral' && ticket.Estado !== 'CERRADO' && <MenuItem className='flex items-center gap-2' onClick={() => addSupportFunction(ticket.Id)}><FaUserPlus className='text-xl' /> Añadir tecnico</MenuItem>}
-                  {!ticket.Solucion && ticket.Tecnico !== 'SoporteGeneral' && <MenuItem className='flex items-center gap-2' onClick={() => endTicket(ticket.Id)}><BsFileEarmarkCheckFill className='text-green-500 text-xl'/> Cerrar </MenuItem>}
+                  {!ticket.Solucion && ticket.Tecnico !== 'SoporteGeneral' && ticket.Estado !== 'CERRADO' && <MenuItem className='flex items-center gap-2' onClick={() => endTicket(ticket.Id)}><BsFileEarmarkCheckFill className='text-green-500 text-xl'/> Cerrar </MenuItem>}
                   <MenuItem>
                     <Link to={`editar/${ticket.Id}`} className='flex items-center gap-2'>
                       <FaPen className='text-blue-500 text-xl'/>
@@ -280,7 +270,8 @@ const Tickets = () => {
         ticket.Usuario.toString().toLowerCase().includes(term.toLowerCase()) ||
         ticket.Tecnico.toString().toLowerCase().includes(term.toLowerCase()) ||
         ticket.Titulo.toString().toLowerCase().includes(term.toLowerCase()) ||
-        ticket.Prioridad.toString().toLowerCase().includes(term.toLowerCase())
+        ticket.Prioridad.toString().toLowerCase().includes(term.toLowerCase()) ||
+        ticket.Estado.toString().toLowerCase().includes(term.toLowerCase())
       ) {
         return ticket;
       }
@@ -293,6 +284,13 @@ const Tickets = () => {
       setValidation(false);
     }
   }
+
+  let techs = {};
+  technicians.filter(tech => tech.Usuario !== 'SoporteGeneral').map(tech => {
+    techs[tech.Usuario] = tech.Usuario;
+    return null;
+  })
+
 
   return (
     <div className='px-3 relative'>
@@ -321,7 +319,7 @@ const Tickets = () => {
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
       <ul className='overflow-auto h-[73vh] 3xl:h-[82vh]'>
         {tickets && tickets.length > 0 && tickets.map(ticket => (
-          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={technicians}/>
+          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={techs}/>
         )).reverse()}
       </ul>
       {validation && <div className='text-center font-bold text-3xl mt-4'>Sin resultados</div>}

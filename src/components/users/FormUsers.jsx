@@ -114,7 +114,7 @@ const FormUsers = () => {
                           message: 'El tipo es requerido'
                         }
                       }}
-                      options={["", "USUARIO", "TECNICO"]}
+                      options={["USUARIO", "TECNICO"]}
                     />
                     <FormSelect
                       field="Estado"  

@@ -20,6 +20,7 @@ const FormTickets = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [tableSub, setTableSub] = useState([]);
   const [technicians, setTechnicians] = useState([]);
+  const [users, setUsers] = useState([])
 
   const {handleSubmit, formState: {errors}, reset, register, watch} = useForm({defaultValues: {Solucion: "", Observacion: "", Tecnico:""}});
 
@@ -64,6 +65,7 @@ const FormTickets = () => {
        .then(res => {
             const {data} = res;
             setTechnicians(data.users.filter(user => user.Tipo === 'TECNICO'));
+            setUsers(data.users);
        })
   }, [])
   
@@ -89,6 +91,17 @@ const FormTickets = () => {
       setSubcategories(results);
       setShowSub(true)
   }, [Categoria, tableSub]);
+
+  const sortUsers = (a, b) => {
+    if (a.Nombre > b.Nombre) {
+      return 1;
+    }
+    if (a.Nombre < b.Nombre) {
+      return -1;
+    }
+
+    return 0;
+  }
 
   return (
     <div className='px-3'>
@@ -205,6 +218,13 @@ const FormTickets = () => {
                       register={register}
                       error={errors.Tecnico}
                       options={technicians.map(tech => tech.Usuario)}
+                      disabled={Estado === 'CERRADO' && true}
+                    />
+                    <FormSelect
+                      field="Usuario" 
+                      register={register}
+                      error={errors.Usuario}
+                      options={users.sort(sortUsers).map(user => user.Usuario)}
                       disabled={Estado === 'CERRADO' && true}
                     />
                     <FormSelect

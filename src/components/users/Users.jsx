@@ -76,6 +76,17 @@ const Users = () => {
       })
   }
 
+  const sortUsers = (a, b) => {
+    if (a.Nombre > b.Nombre) {
+      return 1;
+    }
+    if (a.Nombre < b.Nombre) {
+      return -1;
+    }
+
+    return 0;
+  }
+
   return (
     <div className='px-3'>
       <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 bg-gray-200">
@@ -104,17 +115,12 @@ const Users = () => {
       </div>
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
       <ul className='h-[73vh] 3xl:h-[82vh] overflow-auto'>
-        {users && users.length > 0 && users.map(user => (
+        {users && users.length > 0 && users.sort(sortUsers).map(user => (
           <li key={user.Id} className="bg-white my-2 p-4 rounded-md flex flex-wrap items-center justify-between">
             <div className="flex flex-col gap-1 w-full md:w-auto">
               <h2 className="font-bold">{user.Nombre}</h2>
               <h4>{user.Correo}</h4>
             </div>
-            {/* <div className="flex items-center gap-4">
-              {user.Tipo === 'TECNICO' ? <FaCog className='text-gray-400 text-2xl' title={user.Tipo}/> : <FaUser className='text-gray-400 text-2xl' title={user.Tipo}/>}
-              <Link to={`editar/${user.Id}`}><FaPen className='text-blue-600 cursor-pointer text-2xl'/></Link>
-              <FaRegCheckCircle onClick={() => changeStatus(user.Id)} className={`${user.Estado === 'ACTIVO' ? 'text-green-500' : 'text-gray-400'} cursor-pointer text-2xl`}/>
-            </div> */}
             <div className="w-auto mt-2 sm:mt-0">
               <Menu>
                 <MenuHandler>
