@@ -6,7 +6,8 @@ import { FaAngleLeft, FaSpinner, FaTicketAlt } from 'react-icons/fa'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { apiUrl, config, routeServer } from '../../App'
-import {FormInput, FormSelect} from '../index'
+import { uploadFiles } from '../../utils'
+import {FormDropzone, FormInput, FormSelect} from '../index'
 
 const FormTickets = () => {
 
@@ -21,12 +22,18 @@ const FormTickets = () => {
   const [tableSub, setTableSub] = useState([]);
   const [technicians, setTechnicians] = useState([]);
   const [users, setUsers] = useState([])
+  const [files, setFiles] = useState([])
 
   const {handleSubmit, formState: {errors}, reset, register, watch} = useForm({defaultValues: {Solucion: "", Observacion: "", Tecnico:""}});
 
-  const createTicket = (fields) => {
+  const createTicket = async (fields) => {
     setLoading(true)
-    fields.Usuario = localStorage.getItem('user') 
+
+    const stringUrls = await uploadFiles(files.map(fileObj => fileObj.file));
+
+    fields.Url = stringUrls.join();
+    fields.Usuario = localStorage.getItem('user');
+
     axios.post(`${apiUrl}/tickets`, fields, config)
       .then(res => {
         const {data} = res
@@ -34,7 +41,7 @@ const FormTickets = () => {
         if (data.code === 1){
           navigate(routeServer+"/tickets")
         }
-        setLoading(false)
+        setLoading(false);
       }) 
   }
 
@@ -241,7 +248,18 @@ const FormTickets = () => {
                     />
                   </>
                 )}
-                <Button size='lg' variant='gradient' color="green" className='mt-2' type="submit">{!id ? 'Crear': 'Editar'}</Button>
+                {!id && (
+                  <FormDropzone
+                    files={files}
+                    setFiles={setFiles}
+                    label="Puedes agregar hasta un maximo de 3 archivos en caso de ser necesario."
+                    accept=".pdf, image/*, .docx, .xlsx, .csv, .txt"
+                    maxFiles={3}
+                    header
+                    footer
+                  />
+                )}
+                <Button size='lg' variant='gradient' color="green" className='mt-4' type="submit">{!id ? 'Crear': 'Editar'}</Button>
               </form>
             </>
           )}

@@ -16,3 +16,4 @@ export {default as Reports} from './reports/Reports'
 // Form components
 export {default as FormInput} from './form/FormInput'
 export {default as FormSelect} from './form/FormSelect'
+export {default as FormDropzone} from './form/FormDropzone'

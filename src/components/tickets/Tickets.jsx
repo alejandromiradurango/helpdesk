@@ -3,14 +3,41 @@ import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 import { FaUserPlus, FaUser, FaRegCheckCircle, FaAngleLeft, FaSpinner, FaTicketAlt, FaRegClock, FaAngleDown, FaBan, FaPen, FaEye } from 'react-icons/fa'
-import {BsFileEarmarkCheckFill, BsQuestionCircleFill} from 'react-icons/bs'
+import {BsFileEarmarkCheckFill, BsPaperclip, BsQuestionCircleFill} from 'react-icons/bs'
 import { Link } from 'react-router-dom'
 import { Menu, MenuHandler, MenuList, MenuItem, Button, Input } from "@material-tailwind/react";
 import Swal from 'sweetalert2';
 import { apiUrl, config, routeServer } from '../../App';
-dayjs.extend(utc)
+import { BiFile, BiImage } from 'react-icons/bi';
+import {IoMdClose} from 'react-icons/io'
+import PrismaZoom from 'react-prismazoom'
+dayjs.extend(utc);
 
-const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
+const ZoomModal = ({status, changeStatus, img}) => {
+
+  const bodyClass = document.body.classList;
+
+  const closeModal = () => {
+    bodyClass.remove('overflow-y-hidden');
+    changeStatus(!status);
+  }
+  // eslint-disable-next-line
+  useEffect(() => bodyClass.add('overflow-y-hidden'),[])
+
+  return (
+    <div className='fixed top-0 left-0 w-screen h-screen z-[99] flex justify-center items-center'>
+      <div className='bg-white/60 backdrop-blur-lg h-screen w-screen absolute top-0 left-0 z-[1]' onClick={() => closeModal()}/>
+      <IoMdClose className='fixed top-0 right-0 z-[2] text-[48px] cursor-pointer' onClick={() => closeModal()}/>
+      <div className='relative z-[2] bg-white shadow-2xl rounded-lg md:max-w-[95vw] md:h-[95vh] overflow-hidden animate-fadeIn'>
+        <PrismaZoom>
+          <img src={img} alt="" className='md:max-w-[95vw] md:h-[95vh] object-cover' />
+        </PrismaZoom>
+      </div>
+    </div>
+  )
+}
+
+const Ticket = ({ticket, typeUser, getTickets, technicians = [], status, changeStatus, changeImg}) => {
 
     const [seeMore, setSeeMore] = useState(false)
 
@@ -137,6 +164,11 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
         });
     }
 
+    const openModal = (url) => {
+      changeImg(url)
+      changeStatus(!status)
+    }
+
     return (
         <li className="relative bg-white my-2 pr-4 rounded-md flex flex-col md:flex-row md:items-center justify-between hover:bg-[#fdfdfd] hover:shadow-md transition-all duration-150">
           <div className="px-4 py-2 flex flex-col items-start">
@@ -167,6 +199,37 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = []}) => {
                     <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500' onClick={() => Swal.fire(`Observación - Ticket #${ticket.Id}`, ticket.Observacion, 'info')}>
                       <BsQuestionCircleFill />
                     </Button>
+                )}      
+                {typeUser === 'TECNICO' && ticket.Url && ticket.Estado !== 'CERRADO' && (
+                  <Menu>
+                    <MenuHandler>
+                      <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500'>
+                        <BsPaperclip />
+                      </Button>
+                    </MenuHandler>
+                    <MenuList>
+                      {ticket.Url.split(",").map((url, index) => {
+                        
+                        const type = url.split("/")[4]
+
+                        return (
+                        <MenuItem key={index}>
+                          {type === 'raw' ? (
+                            <a href={url} target="_blank" rel='noreferrer' className='flex items-center gap-2'>
+                            <BiFile className='text-blue-500 text-xl'/>
+                            Descargar archivo
+                            </a>
+                          ) : (
+                            <button type="button" data-url={url} className='flex items-center gap-2' onClick={() => {
+                              openModal(url);
+                            }}>
+                              <BiImage className='text-blue-500 text-xl'/> Ver imagen
+                            </button>
+                          )}
+                        </MenuItem>
+                      )})}
+                    </MenuList>
+                  </Menu>
                 )}      
               </h2>
               {typeUser === 'TECNICO' && (
@@ -231,6 +294,8 @@ const Tickets = () => {
   const [technicians, setTechnicians] = useState([])
   const [validation, setValidation] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [img, setImg] = useState(undefined);
+  const [modal, setModal] = useState(false);
 
   const user = localStorage.getItem('user');
   const typeUser = localStorage.getItem('typeUser');
@@ -319,9 +384,10 @@ const Tickets = () => {
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
       <ul className='overflow-auto h-[73vh] 3xl:h-[82vh]'>
         {tickets && tickets.length > 0 && tickets.map(ticket => (
-          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={techs}/>
+          <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={techs} status={modal} changeStatus={setModal} changeImg={setImg}/>
         )).reverse()}
       </ul>
+      {modal && <ZoomModal status={modal} changeStatus={setModal} img={img}/>}
       {validation && <div className='text-center font-bold text-3xl mt-4'>Sin resultados</div>}
       
     </div>
