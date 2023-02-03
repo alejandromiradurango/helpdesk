@@ -19,9 +19,10 @@ const FormDropzone = ({files, setFiles, accept, header = false, footer = false, 
         value={files}
         header={header}
         footer={footer}
-        maxFileSize={5998000}
+        maxFileSize={10098000}
         label={"Arrastra y suelta aquí tus archivos"}
         accept={accept}
+        localization={"ES-es"}
         minHeight="200px"
         disableScroll
         {...props}
@@ -32,7 +33,6 @@ const FormDropzone = ({files, setFiles, accept, header = false, footer = false, 
               {...file}
               key={file.id}
               onDelete={onDelete}
-              //onSee={handleSee}
               localization={"ES-es"}
               resultOnTooltip={false}
               preview

@@ -1,6 +1,6 @@
 {
   "name": "helpdesk-create",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "homepage": "http://13.92.232.100:81/HelpDeskRG/",
   "dependencies": {
     "@dropzone-ui/react": "^6.7.20",

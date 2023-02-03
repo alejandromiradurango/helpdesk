@@ -10,7 +10,7 @@ export const config = {headers: {Authorization: `Bearer ${localStorage.getItem('
 const App = () => {
 
   return (
-    <div className="bg-gray-200 h-screen">
+    <div className="bg-gray-200 h-screen overflow-x-hidden">
       <BrowserRouter>
         <Routes>
           <Route exact path={routeServer} element={<Layout />}>

@@ -3,7 +3,7 @@ import utc from 'dayjs/plugin/utc'
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 import { FaUserPlus, FaUser, FaRegCheckCircle, FaAngleLeft, FaSpinner, FaTicketAlt, FaRegClock, FaAngleDown, FaBan, FaPen, FaEye } from 'react-icons/fa'
-import {BsFileEarmarkCheckFill, BsPaperclip, BsQuestionCircleFill} from 'react-icons/bs'
+import {BsFileEarmarkCheckFill, BsFilterRight, BsPaperclip, BsQuestionCircleFill} from 'react-icons/bs'
 import { Link } from 'react-router-dom'
 import { Menu, MenuHandler, MenuList, MenuItem, Button, Input } from "@material-tailwind/react";
 import Swal from 'sweetalert2';
@@ -11,6 +11,8 @@ import { apiUrl, config, routeServer } from '../../App';
 import { BiFile, BiImage } from 'react-icons/bi';
 import {IoMdClose} from 'react-icons/io'
 import PrismaZoom from 'react-prismazoom'
+import FormSelect from '../form/FormSelect';
+import { useForm } from 'react-hook-form';
 dayjs.extend(utc);
 
 const ZoomModal = ({status, changeStatus, img}) => {
@@ -200,7 +202,7 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = [], status, changeS
                       <BsQuestionCircleFill />
                     </Button>
                 )}      
-                {typeUser === 'TECNICO' && ticket.Url && ticket.Estado !== 'CERRADO' && (
+                {ticket.Url && ticket.Estado !== 'CERRADO' && (
                   <Menu>
                     <MenuHandler>
                       <Button className='p-0 text-xl bg-transparent shadow-none rounded-full text-blue-500'>
@@ -296,9 +298,16 @@ const Tickets = () => {
   const [loading, setLoading] = useState(false);
   const [img, setImg] = useState(undefined);
   const [modal, setModal] = useState(false);
+  const [filters, setFilters] = useState(false);
+  const [doingFilter, setDoingFilter] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [tableSub, setTableSub] = useState([]);
 
   const user = localStorage.getItem('user');
   const typeUser = localStorage.getItem('typeUser');
+
+  const {register, handleSubmit, watch, formState: {isDirty}, reset} = useForm()
 
   const getTickets = () => {
     setLoading(true)
@@ -324,6 +333,14 @@ const Tickets = () => {
             const {data} = res;
             setTechnicians(data.users.filter(user => user.Tipo === 'TECNICO'));
        })
+    
+    axios.get(`${apiUrl}/helpers`, config)
+     .then(res => {
+        const {data} = res;
+        setCategories(data.categories)
+        setSubcategories(data.subcategories)
+        setTableSub(data.subcategories)
+      })
     // eslint-disable-next-line
   }, [])
 
@@ -356,12 +373,70 @@ const Tickets = () => {
     return null;
   })
 
+  const selectInput = [
+      {
+          field: 'Tecnico',
+          options: ["AlexanderAlvarez", "DanielZora", "HernanRendon"]
+      },
+      {
+          field: 'Estado',
+          options: ["ABIERTO", "PENDIENTE", "CERRADO"]
+      },
+      {
+          field: 'Tipo',
+          options: ["INCIDENCIA", "SOLICITUD"]
+      },
+      {
+          field:"Categoria",
+          options:categories && categories.map(cat => cat.Categoria)
+      },
+      {
+          field:"Subcategoria",
+          options:subcategories && subcategories.map(sub => sub.SubCategoria)
+      },
+      {
+          field: 'Prioridad',
+          options: ["BAJA", "MEDIA", "ALTA"]
+      }
+  ]
+
+  const inputStyle = 'transition-all duration-200 rounded-md border p-2 m-auto w-full md:w-[20em] focus:outline-2 text-sm bg-white border-blue-gray-200 focus:border-blue-500 text-blue-gray-700 disabled:bg-blue-gray-50 disabled:border-0 disabled:appearance-none'
+
+  const {Categoria} = watch()
+
+  useEffect(() => {
+    const results = tableSub?.filter((sub) => sub.Categoria.includes(Categoria));
+    setSubcategories(results);
+  }, [Categoria, tableSub]);
+
+  const order = ["ABIERTO", "PENDIENTE", "CERRADO"];
+
+  const doFilter = data => {
+    setDoingFilter(true);
+    data.FechaC = [];
+    setTickets([]);
+    axios.post(`${apiUrl}/generate-report`, data, config)
+        .then(res => {
+                const {data} = res;
+                setTickets(data.tickets);
+                setTimeout(() => {
+                  setFilters(false);
+                  setDoingFilter(false);
+                }, 250)
+        })
+  }
 
   return (
     <div className='px-3 relative'>
       <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 sticky top-0 bg-gray-200 z-2">
         <h1 className="font-bold text-2xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> {typeUser === 'TECNICO' ? 'Tickets' : 'Mis tickets'} <FaTicketAlt /></h1>
         <div className="flex items-center gap-4">
+          {typeUser === "TECNICO" && (
+            <Button variant='gradient' color="blue-gray" size='lg' className='p-0 flex items-center px-3' onClick={() => setFilters(prev => !prev)}>
+              <span className="p-2 text-white flex items-center gap-2 font-bold text">Filtrar</span> 
+              <BsFilterRight className='scale-150' />
+            </Button>
+          )}
           <div className='hidden sm:block'>
             <Input
               label='Buscar ticket'
@@ -382,14 +457,45 @@ const Tickets = () => {
         </div>
       </div>
       {loading && <div className='text-center font-bold text-3xl mt-24 w-full'><FaSpinner className='animate-spin m-auto block'/></div>}
-      <ul className='overflow-auto h-[73vh] 3xl:h-[82vh]'>
-        {tickets && tickets.length > 0 && tickets.map(ticket => (
+      {validation && <h1 className='text-center font-bold text-3xl mt-4'>Sin resultados</h1>}
+      {!loading && !validation && tickets && tickets.length === 0 && <h1 className='mt-8 font-bold text-center text-3xl'>No se han encontrado tickets</h1>}
+      <ul className='overflow-y-auto h-[76.5vh] 3xl:h-[84vh]'>
+        {tickets && tickets.length > 0 && tickets.sort((a, b) => order.indexOf(b.Estado) - order.indexOf(a.Estado)).map(ticket => (
           <Ticket ticket={ticket} typeUser={typeUser} key={ticket.Id} getTickets={getTickets} technicians={techs} status={modal} changeStatus={setModal} changeImg={setImg}/>
         )).reverse()}
       </ul>
       {modal && <ZoomModal status={modal} changeStatus={setModal} img={img}/>}
-      {validation && <div className='text-center font-bold text-3xl mt-4'>Sin resultados</div>}
-      
+      {typeUser === "TECNICO" && (
+        <>
+        <div className={`absolute w-full h-full top-0 ${filters ? 'left-0 rounded-l-none scale-100' : 'left-[100%] rounded-l-full scale-50'} bg-black/25 transition-all duration-200 backdrop-blur-sm`} onClick={() => setFilters(prev => !prev)}/>
+        <aside className={`min-w-[100%] md:min-w-[25em] border-l-2 border-gray-400 absolute top-0 ${filters ? 'right-0' : '-right-[100%]'} transition-all duration-200  h-screen md:h-full bg-white shadow-2xl z-2 flex flex-col justify-center items-center`}>
+          <IoMdClose className='absolute top-10 right-10 scale-150 cursor-pointer' onClick={() => setFilters(prev => !prev)} />
+          <h2 className='font-bold text-xl '>Filtrar tickets</h2>
+          <form className='flex flex-col gap-2 items-center justify-center min-w-[80%]' onSubmit={handleSubmit(doFilter)}>
+          {selectInput.map((select) => (
+              <FormSelect
+                key={select.field}
+                field={select.field}
+                options={select.options}
+                register={register}
+                label={false}
+                className={inputStyle}
+              />
+          ))}
+            <div className="flex justify-center gap-2 items-center">
+              {isDirty && (
+                <Button color='red' variant='gradient' size='lg' onClick={() => reset()} className="animate-fade-in">
+                    Limpiar
+                </Button>
+              )}
+              <Button type='submit' variant='gradient' size='lg' color='blue' className='disabled:cursor-wait' disabled={doingFilter}>
+                {doingFilter ? 'Filtrando...' : 'Filtrar'}
+              </Button>
+            </div>
+          </form>
+        </aside>
+        </>
+      )}
     </div>
   )
 }

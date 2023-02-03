@@ -4,7 +4,7 @@ import React from 'react'
 const FormInput = ({register, error, field, validation = {}, type = 'input', ...inputProps}) => {
 
     return (
-        <div className='flex justify-between items-center gap-[3em] my-[1em] mx-auto w-full'>
+        <div className='flex justify-between items-center gap-[3em] my-[.5em] mx-auto w-full'>
           <label className='font-bold uppercase hidden sm:block' htmlFor={field}>{field}:</label>
           <div className='relative w-full md:w-auto'>
             {type === 'input' ? (
