@@ -2,7 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import { Layout, Navigation, Users, Login, FormUsers, FormTickets, Tickets, Reports } from './components/index';
 
-export const apiUrl = 'http://13.92.232.100:81/HelpDesk/api'
+// export const apiUrl = 'http://13.92.232.100:81/HelpDesk/api'
+export const apiUrl = 'http://localhost:3001/HelpDesk/api'
 export const routeServer = "/HelpDeskRG" // Production
 export const config = {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}}
 // export const routeServer = "" // Development

@@ -73,7 +73,8 @@ const Reports = () => {
 
   const [categories, setCategories] = useState([])
   const [subcategories, setSubcategories] = useState([])
-  const [tableSub, setTableSub] = useState([])
+  const [tableSub, setTableSub] = useState([]);
+  const [technicians, setTechnicians] = useState([])
   const [loading, setLoading] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const [tickets, setTickets] = useState(undefined)
@@ -86,6 +87,12 @@ const Reports = () => {
     }
 
     setLoading(true)
+    axios.get(`${apiUrl}/users`, config)
+    .then(res => {
+         const {data} = res;
+         setTechnicians(data.users.filter(user => user.Tipo === 'TECNICO'));
+    })
+
     axios.get(`${apiUrl}/helpers`, config)
      .then(res => {
         const {data} = res;
@@ -120,7 +127,7 @@ const Reports = () => {
         },
         {
             field: 'Tecnico',
-            options: ["AlexanderAlvarez", "DanielZora", "HernanRendon"]
+            options: technicians && technicians.map(tech => tech.Usuario)
         }
   ]
 

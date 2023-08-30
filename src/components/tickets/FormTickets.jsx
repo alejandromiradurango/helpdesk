@@ -19,6 +19,7 @@ const FormTickets = () => {
   const [showSub, setShowSub] = useState(false);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [levels, setLevels] = useState([])
   const [tableSub, setTableSub] = useState([]);
   const [technicians, setTechnicians] = useState([]);
   const [users, setUsers] = useState([])
@@ -50,8 +51,8 @@ const FormTickets = () => {
         setLoading(true)
         axios.get(`${apiUrl}/tickets/${id}`, config)
           .then(res => {
-            const {Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario} = res.data.ticket;
-            reset({Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario})
+            const {Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario, Id_Nivel} = res.data.ticket;
+            reset({Tipo, Titulo, Descripcion, Solucion, Observacion, Categoria, Subcategoria, Prioridad, Estado, Tecnico, Usuario, Id_Nivel})
             setTimeout(() => setLoading(false), 1000)
           })
       }
@@ -65,7 +66,8 @@ const FormTickets = () => {
         const {data} = res;
         setCategories(data.categories);
         setSubcategories(data.subcategories)
-        setTableSub(data.subcategories)
+        setTableSub(data.subcategories);
+        setLevels(data.levels);
       })
       
     axios.get(`${apiUrl}/users`, config)
@@ -204,6 +206,21 @@ const FormTickets = () => {
                         options={subcategories.map(sub => sub.SubCategoria)}
                         disabled={Estado === 'CERRADO' && true}
                     />
+                )}
+                {id && (
+                  <FormSelect
+                    field="Nivel" 
+                    register={register}
+                    error={errors.Id_Nivel}
+                    validation={{
+                      required: {
+                        value: true,
+                        message: 'El nivel es requerido'
+                      }
+                    }}
+                    options={levels.map(level => ({value: level.Id, text: level.Descripcion}))}
+                    disabled={Estado === 'CERRADO' && true}
+                  />
                 )}
                 <FormSelect
                   field="Prioridad" 

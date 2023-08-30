@@ -43,11 +43,36 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = [], status, changeS
 
     const [seeMore, setSeeMore] = useState(false)
 
-    const days = dayjs(new Date()).diff(ticket.FechaC, 'days')
+    // Parsa las fechas utilizando el formato adecuado
+    const formato = 'YYYY-MM-DD HH:mm:ss';
+    const date1 = dayjs(ticket.FechaInicio).utc().format(formato);
+    const date2 = dayjs(new Date()).format(formato);
 
-    let Duracion = `${days} días`
 
-    if (days === 1) Duracion = `${days} día`
+    // Función para calcular las horas hábiles entre dos fechas
+    function calcularHorasHabiles(fechaInicio, fechaFin) {
+        let horasHabiles = 0;
+        let current = dayjs(fechaInicio);
+
+        while (current.isBefore(fechaFin)) {
+            if (current.day() >= 1 && current.day() <= 5) { // De lunes a viernes
+                const horaActual = current.hour();
+                if (horaActual >= 6 && horaActual < 17) {
+                    horasHabiles++;
+                }
+            }
+
+            current = current.add(1, 'hour');
+        }
+
+        return horasHabiles;
+    }
+
+    const horasHabiles = calcularHorasHabiles(date1, date2);
+
+    let Duracion = `${horasHabiles - 1} horas`
+
+    if (horasHabiles === 2) Duracion = `${horasHabiles - 1} hora`
 
     const cancelTicket = (id) => {
         Swal.fire({
@@ -260,7 +285,7 @@ const Ticket = ({ticket, typeUser, getTickets, technicians = [], status, changeS
           </div>
           <div className="flex flex-col items-start justify-start gap-2 lg:flex-row lg:items-center lg:gap-8 px-4 pb-4">
             <div className="flex flex-col">
-                <span>Ticket <b>{ticket.Estado}</b>{ticket.Estado !== 'CERRADO' && Duracion && (<><b>:</b> {Duracion}</>)}</span>
+                <span>Ticket <b>{ticket.Estado}</b>{ticket.Estado === 'PENDIENTE' && ticket.FechaInicio && Duracion && (<><b>:</b> {Duracion}</>)}</span>
                 <span>Tecnico: <b>{ticket.Tecnico}</b></span>
             </div>
             <Menu>
@@ -315,11 +340,11 @@ const Tickets = () => {
       const {data} = res
       let tickets = data.tickets;
       if (typeUser === 'USUARIO'){
-        setTickets(tickets.filter(ticket => ticket.Usuario === user));
-        setTableTickets(tickets.filter(ticket => ticket.Usuario === user));
+        setTickets(tickets.filter(ticket => ticket.Usuario === user && ticket.Estado !== 'CERRADO'));
+        setTableTickets(tickets.filter(ticket => ticket.Usuario === user && ticket.Estado !== 'CERRADO'));
       } else {
-        setTickets(tickets);
-        setTableTickets(tickets);
+        setTickets(tickets.filter(ticket => ticket.Estado !== 'CERRADO'));
+        setTableTickets(tickets.filter(ticket => ticket.Estado !== 'CERRADO'));
       }
       setLoading(false);
     })
@@ -376,7 +401,7 @@ const Tickets = () => {
   const selectInput = [
       {
           field: 'Tecnico',
-          options: ["AlexanderAlvarez", "DanielZora", "HernanRendon"]
+          options: technicians && technicians.map(tech => tech.Usuario)
       },
       {
           field: 'Estado',
@@ -415,15 +440,26 @@ const Tickets = () => {
     setDoingFilter(true);
     data.FechaC = [];
     setTickets([]);
-    axios.post(`${apiUrl}/generate-report`, data, config)
+    console.log(data);
+
+    const camposVacios = Object.values(data).every(valor => (
+      (Array.isArray(valor) && valor.length === 0) || (typeof valor === 'string' && valor === "")
+    ));
+
+    if (camposVacios) {
+      // Ejecutar función cuando todos los campos están vacíos
+      getTickets();
+    } else {
+      // Ejecutar función cuando al menos un campo no está vacío
+      axios.post(`${apiUrl}/generate-report`, data, config)
         .then(res => {
                 const {data} = res;
                 setTickets(data.tickets);
-                setTimeout(() => {
-                  setFilters(false);
-                  setDoingFilter(false);
-                }, 250)
+                setFilters(false);
+                setDoingFilter(false);
         })
+    }
+    
   }
 
   return (

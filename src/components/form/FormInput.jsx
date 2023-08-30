@@ -12,7 +12,7 @@ const FormInput = ({register, error, field, validation = {}, type = 'input', ...
                 label={error ? error.message : field}
                 error={error && true} 
                 id={field}
-                className="md:w-[18em]"
+                className="md:w-[24em]"
                 {...register(field, validation)}
                 {...inputProps}
               />
