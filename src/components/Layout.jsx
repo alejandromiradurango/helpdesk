@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { apiUrl, config, routeServer } from '../App';
-import {Header} from './index'
+import {Header, Sidebar} from './index'
 
 const Layout = () => {
 
@@ -26,10 +26,14 @@ const Layout = () => {
 
   return (
     <>
-      <Header/>
-      <div>
-        <Outlet />   
-      </div>
+      {/* <Header/> */}
+      <div className='flex h-screen w-screen overflow-hidden'>
+      <Sidebar />
+      {/* <ToastContainer /> */}
+      <main className='w-full overflow-auto'>
+        <Outlet />
+      </main> 
+    </div>
     </>
   )
 }

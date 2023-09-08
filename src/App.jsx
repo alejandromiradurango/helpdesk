@@ -1,6 +1,10 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import { Layout, Navigation, Users, Login, FormUsers, FormTickets, Tickets, Reports } from './components/index';
+import dayjs from "dayjs";
+import { es } from "dayjs/locale/es";
+
+dayjs.locale("es");
 
 // export const apiUrl = 'http://13.92.232.100:81/HelpDesk/api'
 export const apiUrl = 'http://localhost:3001/HelpDesk/api'

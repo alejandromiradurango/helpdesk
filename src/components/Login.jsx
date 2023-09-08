@@ -5,11 +5,14 @@ import Swal from 'sweetalert2'
 import { apiUrl, routeServer } from '../App'
 import { Input } from "@material-tailwind/react";
 import { logoWhite } from '../assets'
+import { useStateContext } from '../contexts/ContextApp'
 
 const Login = () => {
   const { register, handleSubmit, formState: {errors} } = useForm()
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+
+  const {getToken, getName, getUser, getRol} = useStateContext();
 
   const doLogin = (fields) => {
     setLoading(true)
@@ -18,10 +21,10 @@ const Login = () => {
             .then((res) => {
                 const {data} = res;
                 if (data.code === 1) {
-                    localStorage.setItem('token', data.token)
-                    localStorage.setItem('name', data.user.Nombre)
-                    localStorage.setItem('user', data.user.Usuario)
-                    localStorage.setItem('typeUser', data.user.Tipo)
+                    getToken(data.token)
+                    getName(data.user.Nombre)
+                    getUser(data.user.Usuario)
+                    getRol(data.user.Tipo)
                     window.location.href = routeServer
                 } else {
                     Swal.fire(data.message, '', data.type)

@@ -244,7 +244,7 @@ const FormTickets = () => {
                           message: 'El estado es requerido'
                           }
                       }}
-                      options={["ABIERTO", "PENDIENTE", "CERRADO"]}
+                      options={["ABIERTO", "PENDIENTE", "PENDIENTE POR USUARIO", "PENDIENTE POR PROOVEDOR", "CERRADO"]}
                     />
                   </>
                 )}

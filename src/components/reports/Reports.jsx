@@ -123,7 +123,7 @@ const Reports = () => {
         },
         {
             field: 'Estado',
-            options: ["ABIERTO", "PENDIENTE", "CERRADO"]
+            options: ["ABIERTO", "PENDIENTE", "PENDIENTE POR USUARIO", "PENDIENTE POR PROOVEDOR", "CERRADO"]
         },
         {
             field: 'Tecnico',
@@ -168,15 +168,15 @@ const Reports = () => {
     var ws = XLSX.utils.json_to_sheet(json);
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    XLSX.writeFile(wb, `reporte-${uniqid()}.xlsx`);
+    XLSX.writeFile(wb, `reporte.xlsx`);
     setDownloaded(true);
   }
   
 
   return (
-    <div className='px-3'>
-      <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 bg-gray-200">
-        <h1 className="font-bold text-2xl sm:text-3xl py-3 md:py-4 flex gap-3 items-center"><Link to={routeServer}><FaAngleLeft className='text-gray-700 hover:scale-125 transition-all duration-200' title="Volver"/></Link> Reportes <TbReportAnalytics /></h1>
+    <div className='px-8 py-4'>
+      <div className="flex flex-wrap justify-between items-center w-full border-b-2 border-gray-500 bg-gray-200 py-3 md:py-4">
+        <h1 className="font-bold text-2xl sm:text-3xl flex gap-3 items-center"> Reportes <TbReportAnalytics /></h1>
       </div>
       <div>
         <form onSubmit={handleSubmit(generateReport)} className='rounded-md bg-white shadow-md p-4 my-2'>
