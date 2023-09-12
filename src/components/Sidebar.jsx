@@ -67,6 +67,11 @@ const Sidebar = () => {
           auth: ["TECNICO", "USUARIO"],
           route: '/prioridades',
         },
+        {
+          title: 'Areas',
+          auth: ["TECNICO", "USUARIO"],
+          route: '/areas',
+        },
       ]
     },
     {
@@ -118,9 +123,9 @@ const Sidebar = () => {
               HelpDesk
             </MenuItem>
             {menu.map((nav, index) => (
-              <>
+              <Fragment key={index}>
               {nav.auth.includes(roleCode) && (
-                <Fragment key={index}>
+                <>
                 {!nav.submenu ? (
                     <MenuItem component={<Link to={routeServer+nav.route} />} icon={nav.icon}>
                       {nav.title}
@@ -128,17 +133,17 @@ const Sidebar = () => {
                 ) : (
                   <SubMenu label={nav.title} icon={nav.icon}>
                     {nav.submenu.map((sub, index) => (
-                      <>
+                      <Fragment key={index}>
                         {sub.auth.includes(roleCode) && (
-                          <MenuItem key={index} component={<Link to={routeServer+sub.route} />} icon={sub.icon}> {sub.title}</MenuItem>
+                          <MenuItem component={<Link to={routeServer+sub.route} />} icon={sub.icon}> {sub.title}</MenuItem>
                         )}
-                      </>
+                      </Fragment>
                     ))}
                   </SubMenu>
                 )}
-                </Fragment>
+                </>
               )}
-              </>
+              </Fragment>
             ))}
         </Menu>
       </SB>

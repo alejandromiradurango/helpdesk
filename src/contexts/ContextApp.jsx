@@ -25,7 +25,7 @@ export const ContextApp = ({ children }) => {
     }
 
     const getUser = user => {
-        setRoleCode(user);
+        setUser(user);
         localStorage.setItem("user", user);
     }
 

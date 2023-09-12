@@ -14,6 +14,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.41.2",
     "react-icons": "^4.7.1",
+    "react-loading-skeleton": "^3.3.1",
     "react-medium-image-zoom": "^5.1.2",
     "react-pro-sidebar": "^1.1.0-alpha.1",
     "react-router-dom": "^6.6.1",
@@ -50,7 +51,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.20",
-    "react-prismazoom": "^3.2.0-rc0",
+    "react-prismazoom": "^3.3.5",
     "tailwindcss": "^3.2.4"
   }
 }

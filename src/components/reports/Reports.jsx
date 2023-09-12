@@ -3,13 +3,12 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { FaAngleLeft, FaRegCheckCircle, FaRegClock, FaSpinner, FaTicketAlt, FaUser } from 'react-icons/fa'
+import { FaRegCheckCircle, FaRegClock, FaSpinner, FaTicketAlt, FaUser } from 'react-icons/fa'
 import { TbReportAnalytics } from 'react-icons/tb'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { apiUrl, config, routeServer } from '../../App';
 import FormSelect from '../form/FormSelect';
 import * as XLSX from 'xlsx';
-import uniqid from 'uniqid';
 
 const InputDate = ({register, field, styles}) => (
     <div className='flex justify-between items-center gap-[3em] my-[1em] mx-auto w-auto'>

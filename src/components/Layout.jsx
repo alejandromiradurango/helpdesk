@@ -2,13 +2,15 @@ import axios from 'axios';
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { apiUrl, config, routeServer } from '../App';
-import {Header, Sidebar} from './index'
+import {Sidebar} from './index'
+import { useStateContext } from '../contexts/ContextApp';
 
 const Layout = () => {
 
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const {token} = useStateContext();
 
   useEffect(() => {
     if (!token){
